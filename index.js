@@ -1,7 +1,7 @@
 const { Client } = require('@elastic/elasticsearch');
 
 // Initialize Elasticsearch client
-const client = new Client({ node: 'http://localhost:9200' }); // Replace with your Elasticsearch host and port
+const client = new Client({ node: 'http://localhost:9200' }); // Adjust URL if needed
 
 // Example data to insert
 const data = {
@@ -44,14 +44,14 @@ async function insertData(indexName, data) {
             index: indexName,
             body: data
         });
-        console.log(body);
+        console.log('Data inserted into Elasticsearch:', body);
     } catch (error) {
-        console.error(error);
+        console.error('Error inserting data into Elasticsearch:', error);
     }
 }
 
 // Function to search data in Elasticsearch
-async function searchData(indexName, query) {
+async function searchData(indexName) {
     try {
         const { body } = await client.search({
             index: indexName,
@@ -61,9 +61,9 @@ async function searchData(indexName, query) {
                 }
             }
         });
-        console.log(body.hits.hits);
+        console.log('Retrieved data from Elasticsearch:', body.hits.hits); // Ensure hits array is accessible
     } catch (error) {
-        console.error(error);
+        console.error('Error searching Elasticsearch:', error);
     }
 }
 
@@ -71,7 +71,11 @@ async function searchData(indexName, query) {
 const indexName = 'your_index';
 
 // Insert data into Elasticsearch
-insertData(indexName, data);
-
-// Search and retrieve data from Elasticsearch
-searchData(indexName);
+insertData(indexName, data)
+    .then(() => {
+        // Search and retrieve data from Elasticsearch
+        searchData(indexName);
+    })
+    .catch(error => {
+        console.error('Error inserting or searching data in Elasticsearch:', error);
+    });
